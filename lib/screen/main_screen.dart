@@ -21,8 +21,9 @@ class _MainScreenState extends State<MainScreen> {
           },
           child: Text("게시글 목록"),
           style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
-              foregroundColor: Colors.white),
+            backgroundColor: Colors.blueAccent,
+            foregroundColor: Colors.white,
+          ),
         ),
       ),
     );

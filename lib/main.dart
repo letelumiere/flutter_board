@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_board/screen/main_screen.dart';
 import 'package:flutter_board/screen/board/insert_screen.dart';
 import 'package:flutter_board/screen/board/list_screen.dart';
@@ -16,19 +15,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter demo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        initialRoute: '/main',
-        routes: {
-          '/main': (context) => const MainScreen(),
-          '/board/list': (context) => const ListScreen(),
-          '/board/read': (context) => const ReadScreen(),
-          '/board/insert': (context) => const InsertScreen(),
-          '/board/update': (context) => const UpdateScreen(),
-        });
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      initialRoute: '/main',
+      routes: {
+        '/main': (context) => const MainScreen(),
+        '/board/list': (context) => const ListScreen(),
+        '/board/read': (context) => const ReadScreen(),
+        '/board/insert': (context) => const InsertScreen(),
+        '/board/update': (context) => const UpdateScreen(),
+      },
+    );
   }
 }

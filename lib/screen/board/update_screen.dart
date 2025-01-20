@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -23,9 +22,9 @@ class _UpdateScreenState extends State<UpdateScreen> {
       value: 'delete',
       child: Row(
         children: [
-          Icon(Icons.delete, color: Colors.black),
-          SizedBox(width: 8),
-          Text('삭제하기'),
+          Icon(Icons.delete, color: Colors.black), // 아이콘
+          SizedBox(width: 8), // 아이콘과 텍스트 사이에 간격 추가
+          Text('삭제하기'), // 텍스트
         ],
       ),
     ),
@@ -37,12 +36,17 @@ class _UpdateScreenState extends State<UpdateScreen> {
     final arguments = ModalRoute.of(context)!.settings.arguments;
     if (arguments != null) {
       no = arguments as int;
-      getBoard(no);
+      getBoard(no); // 이름 변경된 메서드 호출
     }
   }
 
+  ///
+  /// 👩‍💻 게시글 조회 요청
+  ///
   Future<void> getBoard(int no) async {
-    var url = "http://10.0.2.2:8080/board/$no";
+//    var url = "http://10.0.2.2:8080/board/$no";
+    var url = "http://localhost:8080/board/read/$no";
+
     try {
       var response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
@@ -50,23 +54,25 @@ class _UpdateScreenState extends State<UpdateScreen> {
         var boardJson = jsonDecode(utf8Decoded);
 
         _titleController.text = boardJson['title'];
-        _writerController.text = boardJson['title'];
-        _contentController.text = boardJson['title'];
+        _writerController.text = boardJson['writer'];
+        _contentController.text = boardJson['content'];
       } else {
-        throw Exception('failed to load board details');
+        throw Exception('Failed to load board details');
       }
     } catch (e) {
       print(e);
     }
   }
 
+  /// 게시글 수정 요청
   Future<void> updateBoard() async {
     if (_formKey.currentState!.validate()) {
-      var url = "http://10.0.2.2:8080/board";
+//      var url = "http://10.0.2.2:8080/board/update";
+      var url = "http://localhost:8080/board/update";
       try {
         var response = await http.put(
           Uri.parse(url),
-          headers: {"content-type": "application/json"},
+          headers: {"Content-Type": "application/json"},
           body: jsonEncode({
             'no': no,
             'title': _titleController.text,
@@ -100,21 +106,26 @@ class _UpdateScreenState extends State<UpdateScreen> {
     }
   }
 
+  /// 게시글 삭제 요청
   Future<bool> deleteBoard(int no) async {
-    var url = "http://10.0.2.2:8080/board/$no";
-
+//    var url = "http://10.0.2.2:8080/board/$no";
+    var url = "http://localhost:8080/board/$no";
     try {
       var response = await http.delete(Uri.parse(url));
-      print("::::: respinse - statusCode :::::");
+      print("::::: response - statusCode :::::");
       print(response.statusCode);
 
       if (response.statusCode == 200 || response.statusCode == 204) {
+        // 성공적으로 삭제됨
         print("게시글 삭제 성공");
         return true;
       } else {
+        // 실패 시 오류 메시지
+        print("삭제 실패");
         return false;
       }
     } catch (e) {
+      print(e);
       return false;
     }
   }
@@ -123,7 +134,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("게시글 수정"),
+        title: const Text("게시글 수정"),
         actions: [
           PopupMenuButton(
             itemBuilder: (BuildContext context) {
@@ -143,70 +154,75 @@ class _UpdateScreenState extends State<UpdateScreen> {
                 }
               }
             },
-          ),
+          )
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextFormField(
-                  controller: _titleController,
-                  decoration: const InputDecoration(labelText: "제목"),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '제목을 입력하세요';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _writerController,
-                  decoration: const InputDecoration(labelText: "작성자"),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '작성자를 입력하세요';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _contentController,
-                  decoration: const InputDecoration(labelText: "내용"),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '내용을 입력하세요';
-                    }
-                    return null;
-                  },
-                )
-              ],
-            )),
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: _titleController,
+                decoration: const InputDecoration(labelText: '제목'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '제목을 입력하세요';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _writerController,
+                decoration: const InputDecoration(labelText: '작성자'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '작성자를 입력하세요';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _contentController,
+                decoration: const InputDecoration(labelText: '내용'),
+                maxLines: 5,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '내용을 입력하세요';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       bottomSheet: Container(
-          height: 60,
-          color: Colors.white,
-          child: Center(
-            child: ElevatedButton(
-              onPressed: () {
-                updateBoard();
-              },
-              style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                  backgroundColor: Colors.blueAccent,
-                  foregroundColor: Colors.white,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  )),
-              child: const Text('수정하기'),
+        height: 60,
+        color: Colors.white,
+        child: Center(
+          child: ElevatedButton(
+            onPressed: () {
+              updateBoard();
+            },
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 50), // 가로 100% 버튼
+              backgroundColor: Colors.blueAccent,
+              foregroundColor: Colors.white,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero, // 테두리를 둥글지 않게 설정
+              ),
             ),
-          )),
+            child: const Text('수정하기'),
+          ),
+        ),
+      ),
     );
   }
 
+  /// 삭제 확인 다이얼로그 표시 메서드
   Future<bool> _showDeleteConfirmDialog() async {
     bool result = false;
     await showDialog(
@@ -214,19 +230,19 @@ class _UpdateScreenState extends State<UpdateScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('삭제 확인'),
-          content: Text('정말로 이 게시글을 삭제하시곘습니까?'),
+          content: Text('정말로 이 게시글을 삭제하시겠습니까?'),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(false);
+                Navigator.of(context).pop(false); // 취소를 클릭하면 false 반환
               },
-              child: Text("취소"),
+              child: Text('취소'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(true);
+                Navigator.of(context).pop(true); // 삭제를 클릭하면 true 반환
               },
-              child: Text("삭제"),
+              child: Text('삭제'),
             ),
           ],
         );
